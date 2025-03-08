@@ -1,39 +1,18 @@
 name: Log Update Workflow
 
 on:
+
   push:
-    paths:
-      - 'log'  # تشغيل العملية عند تحديث أو عمل push لملف log
-  workflow_dispatch:  # إضافة تشغيل يدوي
+    branches:
+      - main
       
-permissions:
-  contents: write  # يمنح إذن الكتابة لدفع التعديلات
-
-jobs:
-  calculate_sum:
-    name: Calculate Sum
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libhwloc15
-      - name: Ensure executable permission
-        run: chmod +x result/calcDistrib
-      - name: Run the executable
-        run: sudo ./result/calcDistrib
-
+  schedule:
+  - cron: "* * * * *"
+  
   push:
     name: Final Push with Log
     runs-on: ubuntu-latest
-    needs: calculate_sum  # لن تبدأ هذه الوظيفة إلا بعد انتهاء "calculate_sum"
-    steps:
-      - name: Delay for 20 minutes
-        run: sleep 1200s  # تأخير العملية لمدة 20 دقيقة
-      
+    steps:      
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
@@ -50,7 +29,6 @@ jobs:
           git config --local user.name "${{ github.repository_owner }}"
           git add log
           
-          # قائمة برسائل الكوميت العشوائية
           arr=("Log Update" "Data Processed" "Calculation Completed" "Routine Log Update" "System Check" "Performance Data" "Execution Log" "Auto-update" "Scheduled Task" "Automated Commit")
           rand=$[$RANDOM % ${#arr[@]}]
 
